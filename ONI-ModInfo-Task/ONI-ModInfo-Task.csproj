@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFrameworks>netstandard2.0;net47</TargetFrameworks>
+        <PackageOutputPath>$(MSBuildThisFileDirectory)../artifacts</PackageOutputPath>
+        <NoPackageAnalysis>true</NoPackageAnalysis>
+        <BuildOutputTargetFolder>tasks</BuildOutputTargetFolder>
+        <VersionPrefix>0.1.0</VersionPrefix>
+        <VersionSuffix>build$([System.DateTime]::Now.ToString('yyyyMMdd-HHmm'))</VersionSuffix>
+        <RootNamespace>ONI_ModInfo_Task</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Build.Framework" Version="16.10.0" />
+        <PackageReference Include="Microsoft.Build.Tasks.Core" Version="16.10.0" />
+        <PackageReference Update="@(PackageReference)" PrivateAssets="All" />
+        <PackageReference Include="YamlDotNet" Version="11.2.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Content Include="../README.md">
+            <Pack>true</Pack>
+            <PackagePath>/</PackagePath>
+        </Content>
+        <Content Include="build/**">
+            <Pack>true</Pack>
+            <PackagePath>build</PackagePath>
+        </Content>
+        <Content Include="buildMultiTargeting/**">
+            <Pack>true</Pack>
+            <PackagePath>buildMultiTargeting</PackagePath>
+        </Content>
+    </ItemGroup>
+
+</Project>
