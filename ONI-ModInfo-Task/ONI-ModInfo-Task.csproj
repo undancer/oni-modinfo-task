@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" Sdk="Microsoft.NET.Sdk">
-    
+
+    <PropertyGroup>
+        <authors>undancer</authors>
+        <description>为缺氧mod而提供的msbuild task</description>
+    </PropertyGroup>
+
     <PropertyGroup>
         <TargetFrameworks>netstandard2.0;net47</TargetFrameworks>
         <PackageOutputPath>$(MSBuildThisFileDirectory)../artifacts</PackageOutputPath>
