@@ -5,13 +5,7 @@
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
     </PropertyGroup>
-
     <ItemGroup>
         <PackageReference Include="ONI-ModInfo-Task" Version="0.1.0-*" PrivateAssets="All"/>
     </ItemGroup>
-
-    <Target Name="Foo" BeforeTargets="Build">
-        <ModInfoTask/>
-    </Target>
-
 </Project>
