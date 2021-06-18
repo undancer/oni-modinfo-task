@@ -47,44 +47,23 @@ namespace ONI_ModInfo_Task
             Log.LogMessage($"OutputFilePath {OutputFilePath}");
             Log.LogMessage($"UseArchivedVersions {UseArchivedVersions}");
             // 生成特定的目录结构
-            foreach (var supportedContent in supportedContentList)
+            WriteModInfo(_tempWorkSpace, supportedContentList.First(), lastWorkingBuild);
+            CopyFiles(InputFilePath, _tempWorkSpace, OutputFilePath);
+            if (UseArchivedVersions)
             {
-                var targetDirectoryName = string
-                    .Join("_", supportedContent, lastWorkingBuild)
-                    .ToLower();
-                var targetDirectory = Path.Combine(
-                    new string[0]
-                        .Concat(
-                            new[]
-                            {
-                                _tempWorkSpace
-                            }
-                        )
-                        .Concat(
-                            new[]
-                            {
-                                "archived_versions",
-                                targetDirectoryName
-                            }.Where(input => UseArchivedVersions)
-                        ).ToArray()
-                );
-
-
-                // 创建目标文件夹
-                Directory.CreateDirectory(targetDirectory);
-                Log.LogMessage($"TargetDirectory {targetDirectory}");
-                // 创建mod_info.yaml文件
-                using (var writer = new StreamWriter(Path.Combine(targetDirectory, "mod_info.yaml")))
+                foreach (var supportedContent in supportedContentList)
                 {
-                    _serializer.Serialize(writer,
-                        ImmutableDictionary.Create<string, object>()
-                            .Add(nameof(supportedContent), supportedContent)
-                            .Add(nameof(lastWorkingBuild), lastWorkingBuild)
-                    );
-                }
+                    var targetDirectoryName = string.Join("_", supportedContent, lastWorkingBuild).ToLower();
+                    var targetDirectory = Path.Combine(_tempWorkSpace, "archived_versions", targetDirectoryName);
 
-                // 复制dll到临时目录结构中
-                CopyFiles(InputFilePath, targetDirectory, OutputFilePath);
+                    // 创建目标文件夹
+                    Directory.CreateDirectory(targetDirectory);
+                    Log.LogMessage($"TargetDirectory {targetDirectory}");
+                    // 创建mod_info.yaml文件
+                    WriteModInfo(targetDirectory, supportedContent, lastWorkingBuild);
+                    // 复制dll到临时目录结构中
+                    CopyFiles(InputFilePath, targetDirectory, OutputFilePath);
+                }
             }
 
             // 从临时目录复制到输出目录
@@ -94,6 +73,18 @@ namespace ONI_ModInfo_Task
             Directory.Delete(_tempWorkSpace, true);
 
             return true;
+        }
+
+        private void WriteModInfo(string targetDirectory, string supportedContent, int lastWorkingBuild)
+        {
+            using (var writer = new StreamWriter(Path.Combine(targetDirectory, "mod_info.yaml")))
+            {
+                _serializer.Serialize(writer,
+                    ImmutableDictionary.Create<string, object>()
+                        .Add(nameof(supportedContent), supportedContent)
+                        .Add(nameof(lastWorkingBuild), lastWorkingBuild)
+                );
+            }
         }
 
         private static void CopyFiles(string inputPath, string outputPath, string excludePath = "")
@@ -106,10 +97,11 @@ namespace ONI_ModInfo_Task
             {
                 var sourceFileName = Path.Combine(inputPath, file);
                 var destFileName = Path.Combine(outputPath, file);
-
-                var destDirectory = new FileInfo(destFileName).Directory?.ToString();
+                var destFileInfo = new FileInfo(destFileName);
+                var destDirectory = destFileInfo.Directory?.ToString();
                 if (destDirectory == null) continue;
                 Directory.CreateDirectory(destDirectory);
+                if (destFileInfo.Name.Equals(".DS_Store")) continue;
                 File.Copy(sourceFileName, destFileName, true);
             }
         }
