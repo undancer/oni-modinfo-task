@@ -10,35 +10,6 @@
         <TaskAssembly>$(MSBuildThisFileDirectory)..\tasks\$(TaskFolder)\ONI-ModInfo-Task.dll</TaskAssembly>
     </PropertyGroup>
 
-    <UsingTask TaskName="ModInfoTask" AssemblyFile="$(TaskAssembly)"/>
-
-    <Target Name="GenModInfo" AfterTargets="Build">
-
-        <PropertyGroup>
-            <!-- <SupportedContent>vanilla_id</SupportedContent> -->
-            <UseArchivedVersions>true</UseArchivedVersions>
-            <SupportedContent>vanilla_id,expansion1_id</SupportedContent>
-            <!-- 九宫格输入法里的i sign，本想写imsign的，可是数字超出当前版本号 -->
-            <LastWorkingBuild>407446</LastWorkingBuild>
-            <InstallFolder>$(OutDir)</InstallFolder>
-        </PropertyGroup>
-
-        <ModInfoTask
-                UseArchivedVersions="$(UseArchivedVersions)"
-                SupportedContent="$(SupportedContent)"
-                LastWorkingBuild="$(LastWorkingBuild)"
-        >
-            <Output TaskParameter="OutputDirectory" PropertyName="_OutputDirectory"/>
-        </ModInfoTask>
-
-        <ItemGroup>
-            <ModInfoFiles Include="$(_OutputDirectory)\**\*.*"/>
-        </ItemGroup>
-
-        <Move
-                SourceFiles="@(ModInfoFiles)"
-                DestinationFiles="@(ModInfoFiles->'$(InstallFolder)\%(RecursiveDir)%(Filename)%(Extension)')"
-        />
-    </Target>
+    <UsingTask TaskName="ModInfo" AssemblyFile="$(TaskAssembly)"/>
 
 </Project>

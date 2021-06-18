@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
@@ -8,4 +7,18 @@
     <ItemGroup>
         <PackageReference Include="ONI-ModInfo-Task" Version="0.1.0-*" PrivateAssets="All"/>
     </ItemGroup>
+    
+    <Target Name="Foo" AfterTargets="build">
+
+        <PropertyGroup>
+            <InputFilePath>$(MSBuildThisFileDirectory)$(OutputPath)</InputFilePath>
+            <OutputFilePath>$(MSBuildThisFileDirectory)$(OutputPath)\publish</OutputFilePath>
+        </PropertyGroup>
+
+        <ModInfo
+                InputFilePath="$(InputFilePath)"
+                OutputFilePath="$(OutputFilePath)"
+        />
+    </Target>
+
 </Project>

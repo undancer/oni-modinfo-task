@@ -26,15 +26,15 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Content Include="../README.md">
+        <Content Include="..\README.md">
             <Pack>true</Pack>
             <PackagePath/>
         </Content>
-        <Content Include="build/**">
+        <Content Include="build\**">
             <Pack>true</Pack>
             <PackagePath>build</PackagePath>
         </Content>
-        <Content Include="buildMultiTargeting/**">
+        <Content Include="buildMultiTargeting\**">
             <Pack>true</Pack>
             <PackagePath>buildMultiTargeting</PackagePath>
         </Content>
