@@ -26,6 +26,8 @@ namespace ONI_ModInfo_Task
 
         // 当前支持的版本号，不设置的话，默认值为407446，即九宫格输入法里的i sign。
         public int LastWorkingBuild { get; set; } = 407446;
+        
+        public int APIVersion { get; set; } = 0;
 
         // 临时文件夹，任务结束后，这个文件夹应该不存在
         private readonly string _tempWorkSpace = Path.Combine(
@@ -83,6 +85,7 @@ namespace ONI_ModInfo_Task
                     ImmutableDictionary.Create<string, object>()
                         .Add(nameof(supportedContent), supportedContent)
                         .Add(nameof(lastWorkingBuild), lastWorkingBuild)
+                        .Add("APIVersion",APIVersion)
                 );
             }
         }
