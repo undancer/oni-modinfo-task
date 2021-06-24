@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.Build.Framework;
@@ -25,7 +25,7 @@ namespace ONI_ModInfo_Task
         public string SupportedContent { get; set; } = "vanilla_id";
 
         // 当前支持的版本号，不设置的话，默认值为407446，即九宫格输入法里的i sign。
-        public int LastWorkingBuild { get; set; } = 407446;
+        public int MinimumSupportedBuild { get; set; } = 407446;
         
         public int APIVersion { get; set; } = 0;
 
@@ -40,7 +40,7 @@ namespace ONI_ModInfo_Task
             // 获取参数
             var supportedContentList = SupportedContent.Split(',', ';', '|');
             UseArchivedVersions = supportedContentList.Length > 1 || UseArchivedVersions;
-            var lastWorkingBuild = LastWorkingBuild;
+            var minimumSupportedBuild = MinimumSupportedBuild;
 
             // 创建临时文件夹
             Directory.CreateDirectory(_tempWorkSpace);
@@ -49,20 +49,20 @@ namespace ONI_ModInfo_Task
             Log.LogMessage($"OutputFilePath {OutputFilePath}");
             Log.LogMessage($"UseArchivedVersions {UseArchivedVersions}");
             // 生成特定的目录结构
-            WriteModInfo(_tempWorkSpace, supportedContentList.First(), lastWorkingBuild);
+            WriteModInfo(_tempWorkSpace, supportedContentList.First(), minimumSupportedBuild);
             CopyFiles(InputFilePath, _tempWorkSpace, OutputFilePath);
             if (UseArchivedVersions)
             {
                 foreach (var supportedContent in supportedContentList)
                 {
-                    var targetDirectoryName = string.Join("_", supportedContent, lastWorkingBuild).ToLower();
+                    var targetDirectoryName = string.Join("_", supportedContent, minimumSupportedBuild).ToLower();
                     var targetDirectory = Path.Combine(_tempWorkSpace, "archived_versions", targetDirectoryName);
 
                     // 创建目标文件夹
                     Directory.CreateDirectory(targetDirectory);
                     Log.LogMessage($"TargetDirectory {targetDirectory}");
                     // 创建mod_info.yaml文件
-                    WriteModInfo(targetDirectory, supportedContent, lastWorkingBuild);
+                    WriteModInfo(targetDirectory, supportedContent, minimumSupportedBuild);
                     // 复制dll到临时目录结构中
                     CopyFiles(InputFilePath, targetDirectory, OutputFilePath);
                 }
@@ -77,17 +77,23 @@ namespace ONI_ModInfo_Task
             return true;
         }
 
-        private void WriteModInfo(string targetDirectory, string supportedContent, int lastWorkingBuild)
+        private void WriteModInfo(string targetDirectory, Dictionary<string, object> dictionary)
         {
             using (var writer = new StreamWriter(Path.Combine(targetDirectory, "mod_info.yaml")))
             {
-                _serializer.Serialize(writer,
-                    ImmutableDictionary.Create<string, object>()
-                        .Add(nameof(supportedContent), supportedContent)
-                        .Add(nameof(lastWorkingBuild), lastWorkingBuild)
-                        .Add("APIVersion",APIVersion)
-                );
+                _serializer.Serialize(writer, dictionary);
             }
+        }
+
+        private void WriteModInfo(string targetDirectory, string supportedContent, int minimumSupportedBuild)
+
+        {
+            WriteModInfo(targetDirectory, new Dictionary<string, object>()
+            {
+                {nameof(supportedContent), supportedContent},
+                {nameof(minimumSupportedBuild), minimumSupportedBuild},
+                {"APIVersion", APIVersion},
+            });
         }
 
         private static void CopyFiles(string inputPath, string outputPath, string excludePath = "")
